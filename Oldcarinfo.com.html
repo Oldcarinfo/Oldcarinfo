@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oldcarinfo.com</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #26c6da 25%, #9ccc65 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: black;
+        }
+
+        .search-bar {
+            position: relative;
+            margin-top: 10px;
+        }
+
+        input[type="text"] {
+            width: 70%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #4CAF;
+        }
+
+        button {
+            padding: 12px 18px;
+            font-size: 16px;
+            color: white;
+            background-color: #9ccc65;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #26c6da;
+        }
+
+        .autocomplete-list {
+            position: absolute;
+            top: 50px;
+            left: 15%;
+            width: 70%;
+            border: 1px solid #ddd;
+            background: white;
+            max-height: 150px;
+            overflow-y: auto;
+            z-index: 1000;
+            border-radius: 5px;
+        }
+
+        .autocomplete-item {
+            padding: 10px;
+            cursor: pointer;
+            background: white;
+        }
+
+        .autocomplete-item:hover {
+            background: #f0f0f0;
+        }
+
+        .car-info {
+            margin-top: 30px;
+            text-align: left;
+            color: #333;
+        }
+
+        .car-info h2 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .car-info p {
+            line-height: 1.6;
+        }
+        <meta name="description" content="Old Car Info: A website about vintage and classic cars.">
+<meta name="keywords" content="old cars, classic cars, vintage cars">
+<meta name="author" content="Akitha Induwara">
+<title>Old Car Info</title>
+    </style>
+    <meta name="description" content="Old Car Info: A website about vintage and classic cars.">
+<meta name="keywords" content="old cars, classic cars, vintage cars">
+<meta name="author" content="Akitha Induwara">
+<title>Old Car Info</title>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Old Car Information</h1>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search any car" oninput="showSuggestions(this.value)">
+            <button onclick="searchCar()">Search</button>
+            <div class="autocomplete-list" id="autocompleteList"></div>
+        </div>
+        
+        <div class="car-info" id="carInfo">
+            <!-- Car details will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        const carData = [
+                        {
+                name: "Toyota Supra MK4",
+                year: "1993 - 2002",
+                engine: "3.0L Inline-6 (2JZ-GTE) Twin Turbo",
+                horsepower: "276 hp (Japan), up to 320 hp (US)",
+                topSpeed: "Approximately 155 mph (250 km/h)",
+                description: "The Toyota Supra MK4 is famous for its powerful 2JZ-GTE engine and high tuning potential.",
+                tags: ["supra", "mk4", "toyota","1998","1997","1996","1995","1994","1993"]
+            },
+            {
+    name: "Ford Mustang GT (4th Gen, New Edge)",
+    year: "1999-2004",
+    engine: "4.6L V8",
+    horsepower: "260 hp",
+    topSpeed: "149 mph (240 km/h)",
+    description: "The Ford Mustang GT of the New Edge era brought sharper styling and improved performance to the iconic pony car. Its affordable price and classic V8 engine made it a favorite among muscle car enthusiasts.",
+    tags: ["ford", "mustang", "gt", "new edge", "muscle car","1999","2000","2001","2003","2004"]
+},
+{
+    name: "Chevrolet Camaro SS (4th Gen)",
+    year: "1998-2002",
+    engine: "5.7L LS1 V8",
+    horsepower: "325 hp",
+    topSpeed: "160 mph (257 km/h)",
+    description: "The fourth-generation Chevrolet Camaro SS packed an LS1 V8 engine, offering strong performance and iconic styling. It remains a beloved classic among muscle car purists.",
+    tags: ["chevrolet", "camaro", "ss", "muscle car","1998","1999","2000","2001","2002"]
+},
+{
+    name: "Pontiac Firebird Trans Am WS6",
+    year: "1998-2002",
+    engine: "5.7L LS1 V8",
+    horsepower: "325 hp",
+    topSpeed: "161 mph (259 km/h)",
+    description: "The Pontiac Firebird Trans Am WS6 was a high-performance version of the Firebird, featuring aggressive styling and a potent LS1 V8 engine. Its ram-air hood and handling upgrades made it a standout in the muscle car segment.",
+    tags: ["pontiac", "firebird", "trans am", "ws6", "muscle car","1998","1999","2000","2001","2002"]
+},
+{
+    name: "Dodge Charger R/T (LX)",
+    year: "2005",
+    engine: "5.7L HEMI V8",
+    horsepower: "340 hp",
+    topSpeed: "150 mph (241 km/h)",
+    description: "The 2005 Dodge Charger R/T revived the Charger nameplate with a modern design and a powerful HEMI V8. It combined retro styling cues with modern performance and comfort.",
+    tags: ["dodge", "charger", "rt", "hemi", "muscle car","2005"]
+},
+{
+    name: "Chevrolet Monte Carlo SS (6th Gen)",
+    year: "2000-2005",
+    engine: "3.8L V6 Supercharged (later years)",
+    horsepower: "240 hp",
+    topSpeed: "138 mph (222 km/h)",
+    description: "The Chevrolet Monte Carlo SS offered a blend of muscle car heritage and daily usability. While it was less powerful than its peers, the supercharged V6 variant provided solid performance and a comfortable ride.",
+    tags: ["chevrolet", "monte carlo", "ss", "muscle car","2000","2001","2002","2003","2004","2005"]
+},
+            {
+    name: "Mazda MX-5 Miata (NB)",
+    year: "1999-2005",
+    engine: "1.8L Inline-4",
+    horsepower: "140-178 hp (depending on trim and market)",
+    topSpeed: "127 mph (204 km/h)",
+    description: "The Mazda MX-5 Miata (NB) is a lightweight roadster known for its perfect 50:50 weight distribution and nimble handling. It became a global favorite among driving enthusiasts for its simplicity and fun-to-drive nature.",
+    tags: ["mazda", "mx5", "miata", "roadster","1999","2000","2001","2002","2003","2004","2005"]
+},
+{
+    name: "Lamborghini Murciélago",
+    year: "2001",
+    engine: "6.2L V12",
+    horsepower: "572 hp",
+    topSpeed: "205 mph (330 km/h)",
+    description: "The Lamborghini Murciélago is a flagship supercar that marked the brand's revival in the early 2000s. Its aggressive design, scissor doors, and roaring V12 engine are a testament to Lamborghini's legacy.",
+    tags: ["lamborghini", "murcielago", "supercar", "v12","2001"]
+},
+{
+    name: "Mercedes-Benz SLR McLaren",
+    year: "2003",
+    engine: "5.4L Supercharged V8",
+    horsepower: "617 hp",
+    topSpeed: "208 mph (335 km/h)",
+    description: "The Mercedes-Benz SLR McLaren blends luxury and performance, featuring advanced aerodynamics and a front-mid-engine layout. It stands out as one of the most iconic grand tourers of its time.",
+    tags: ["mercedes-benz", "slr", "mclaren", "grand tourer","2003"]
+},
+{
+    name: "Dodge Viper SRT-10",
+    year: "2003",
+    engine: "8.3L V10",
+    horsepower: "500 hp",
+    topSpeed: "190 mph (306 km/h)",
+    description: "The Dodge Viper SRT-10 is a raw and powerful American sports car, featuring a massive V10 engine and a focus on minimalistic, driver-oriented performance. It remains an icon of unrestrained automotive engineering.",
+    tags: ["dodge", "viper", "srt10", "american sports car","2003"]
+},
+{
+    name: "Aston Martin Vanquish",
+    year: "2001",
+    engine: "5.9L V12",
+    horsepower: "460 hp",
+    topSpeed: "190 mph (306 km/h)",
+    description: "The Aston Martin Vanquish is a stunning grand tourer that combines British elegance with exhilarating performance. Its sleek design and luxurious interior made it a favorite among those seeking both speed and sophistication.",
+    tags: ["aston martin", "vanquish", "grand tourer", "luxury","2001"]
+},
+            {
+                name: "Bugatti Veyron",
+                year: "2005 - 2015",
+                engine: "8.0L Quad-Turbocharged W16",
+                horsepower: "987 hp (Standard), up to 1,200 hp (Super Sport)",
+                topSpeed: "Approximately 253 mph (407 km/h), up to 267 mph (431 km/h) for Super Sport",
+                description: "The Bugatti Veyron set records for its top speed and was one of the first hypercars to exceed 1,000 hp.",
+                tags: ["bugatti", "veyron", "hypercar"]
+            },
+            {
+    name: "Nissan Skyline GT-R R34",
+    year: "1999-2002",
+    engine: "2.6L Inline-6 Twin-Turbo",
+    horsepower: "276 hp (officially) but capable of much more",
+    topSpeed: "155 mph (250 km/h), higher with tuning",
+    description: "The Nissan Skyline GT-R R34 is a legendary Japanese sports car known for its advanced all-wheel-drive system and RB26DETT engine. It became a cultural icon through its appearances in racing games and movies like The Fast and the Furious franchise.",
+    tags: ["nissan", "skyline", "r34", "jdm legend"]
+},
+{
+    name: "Ferrari Enzo",
+    year: "2002",
+    engine: "6.0L V12",
+    horsepower: "651 hp",
+    topSpeed: "217 mph (350 km/h)",
+    description: "The Ferrari Enzo is a supercar that embodies Ferrari's Formula 1 technology. With carbon fiber construction and an advanced aerodynamics package, it remains one of the most iconic hypercars of its era.",
+    tags: ["ferrari", "enzo", "supercar", "iconic","2002"]
+},
+{
+    name: "Ford Mustang SVT Cobra R",
+    year: "2000",
+    engine: "5.4L V8",
+    horsepower: "385 hp",
+    topSpeed: "170 mph (274 km/h)",
+    description: "The Mustang SVT Cobra R is a high-performance version of the Mustang designed for track enthusiasts. Its aggressive styling and powerful engine make it a standout among muscle cars of its time.",
+    tags: ["ford", "mustang", "cobra r", "muscle car","2000"]
+},
+{
+    name: "Porsche Carrera GT",
+    year: "2004",
+    engine: "5.7L V10",
+    horsepower: "603 hp",
+    topSpeed: "205 mph (330 km/h)",
+    description: "The Porsche Carrera GT is a masterpiece of engineering, featuring a racing-derived V10 engine and a lightweight carbon fiber chassis. Its stunning design and exhilarating performance solidify its place in supercar history.",
+    tags: ["porsche", "carrera gt", "supercar", "iconic","2004"]
+},
+{
+    name: "Chevrolet Corvette Z06 (C5)",
+    year: "2001",
+    engine: "5.7L V8",
+    horsepower: "385 hp (2001) / 405 hp (2002-2004)",
+    topSpeed: "171 mph (275 km/h)",
+    description: "The Corvette Z06 (C5) offers exceptional performance for its price, with a lightweight design and track-focused upgrades. It’s a favorite among American sports car enthusiasts.",
+    tags: ["chevrolet", "corvette", "z06", "american sports car","2001"]
+},
+            {
+    name: "BMW M3 GTR",
+    year: "2001",
+    engine: "4.0L V8",
+    horsepower: "493 hp",
+    topSpeed: "Approximately 190 mph (306 km/h)",
+    description: "The BMW M3 GTR gained iconic status as the main car featured in Need for Speed: Most Wanted (2005). Known for its unique livery and powerful performance, it remains a fan favorite in racing game history.",
+    tags: ["bmw", "m3 gtr", "nfs most wanted", "iconic car","2001"]
+},
+{
+    name: "Dodge Challenger",
+    year: "1970 - Present",
+    engine: "Varies by model (e.g., 6.2L Supercharged HEMI V8 for Hellcat)",
+    horsepower: "Up to 807 hp (SRT Super Stock)",
+    topSpeed: "Approximately 203 mph (327 km/h) for Hellcat models",
+    description: "The Dodge Challenger is a classic American muscle car known for its powerful V8 engines, aggressive styling, and strong performance. Modern iterations, such as the Hellcat, push the limits of horsepower and speed.",
+    tags: ["dodge", "challenger", "muscle car", "american classic","1970"]
+},
+{
+    name: "Akitha Induwara",
+    year: "born in 2011",
+    engine: "normal human hart full of kindness ",
+    horsepower: "I think humans dont have Horsepower,they have humanpower",
+    topSpeed: "50 mph(I know i can't run that fast)",
+    description: "13y old kid when making this website,a kid love to play games but don't has a powerful computer to run new games",
+    tags: ["ratatatata", "owner", "Akitha", "creater"]
+},
+            {
+                name: "Lamborghini Diablo",
+                year: "1990 - 2001",
+                engine: "5.7L - 6.0L V12",
+                horsepower: "485 hp (Early Models), up to 530 hp (Diablo GT)",
+                topSpeed: "Approximately 202 mph (325 km/h)",
+                description: "The Lamborghini Diablo was a flagship supercar known for its raw power and aggressive design.",
+                tags: ["lamborghini", "diablo", "supercar"]
+            },
+            {
+                name: "Lamborghini Gallardo",
+                year: "2003 - 2013",
+                engine: "5.0L - 5.2L V10",
+                horsepower: "493 hp (Early Models), up to 562 hp (LP570-4 Superleggera)",
+                topSpeed: "Approximately 202 mph (325 km/h)",
+                description: "The Gallardo is one of Lamborghini’s best-selling models, offering a perfect balance of power and handling.",
+                tags: ["lamborghini", "gallardo", "supercar"]
+            },
+            {
+                name: "Ferrari F40",
+                year: "1987 - 1992",
+                engine: "2.9L Twin-Turbo V8",
+                horsepower: "471 hp",
+                topSpeed: "Approximately 201 mph (323 km/h)",
+                description: "The Ferrari F40 is an iconic supercar, known for its lightweight design and twin-turbo V8 engine.",
+                tags: ["ferrari", "f40", "supercar"]
+            },
+            {
+                name: "McLaren F1",
+                year: "1992 - 1998",
+                engine: "6.1L V12",
+                horsepower: "627 hp",
+                topSpeed: "Approximately 240 mph (386 km/h)",
+                description: "The McLaren F1 was the fastest production car of its time, renowned for its innovative design and central driving position.",
+                tags: ["mclaren", "f1", "hypercar"]
+            },
+            {
+                name: "Porsche 959",
+                year: "1986 - 1988",
+                engine: "2.85L Twin-Turbo Flat-6",
+                horsepower: "444 hp",
+                topSpeed: "Approximately 197 mph (317 km/h)",
+                description: "The Porsche 959 was an advanced supercar featuring all-wheel drive and numerous technological innovations.",
+                tags: ["porsche", "959", "supercar"]
+            },
+            {
+                name: "Koenigsegg CCX",
+                year: "2006 - 2010",
+                engine: "4.7L Supercharged V8",
+                horsepower: "806 hp",
+                topSpeed: "Approximately 245 mph (394 km/h)",
+                description: "The Koenigsegg CCX is a high-performance supercar, showcasing Koenigsegg's expertise in automotive engineering.",
+                tags: ["koenigsegg", "ccx", "supercar"]
+            },
+            {
+                name: "Pagani Zonda C12",
+                year: "1999 - 2011",
+                engine: "6.0L - 7.3L V12",
+                horsepower: "394 hp (C12), up to 750 hp (Zonda R)",
+                topSpeed: "Approximately 220 mph (354 km/h)",
+                description: "The Pagani Zonda is known for its unique design and powerful AMG-sourced V12 engines.",
+                tags: ["pagani", "zonda", "supercar"]
+            },
+            {
+                name: "Aston Martin One-77",
+                year: "2009 - 2012",
+                engine: "7.3L V12",
+                horsepower: "750 hp",
+                topSpeed: "Approximately 220 mph (354 km/h)",
+                description: "The Aston Martin One-77 is a limited-edition supercar, known for its exclusive design and naturally aspirated V12 engine.",
+                tags: ["aston martin", "one-77", "supercar"]
+            },
+            {
+                name: "Mercedes-Benz SLR McLaren",
+                year: "2003 - 2010",
+                engine: "5.4L Supercharged V8",
+                horsepower: "617 hp",
+                topSpeed: "Approximately 208 mph (334 km/h)",
+                description: "The SLR McLaren combines Mercedes-Benz luxury with McLaren performance, delivering both style and speed.",
+                tags: ["mercedes-benz", "slr mclaren", "supercar"]
+            },
+            {
+                name: "Toyota Supra MK3",
+                year: "1986 - 1992",
+                engine: "3.0L Inline-6 (7M-GTE) Turbo",
+                horsepower: "230 hp",
+                topSpeed: "Approximately 145 mph (233 km/h)",
+                description: "The Toyota Supra MK3 introduced turbocharging and laid the groundwork for the legendary MK4.",
+                tags: ["supra", "mk3", "toyota"]
+            },
+            {
+                name: "Nissan Skyline GT-R R34",
+                year: "1999 - 2002",
+                engine: "2.6L Inline-6 (RB26DETT) Twin Turbo",
+                horsepower: "276 hp (Japan)",
+                topSpeed: "165 mph (265 km/h)",
+                description: "The R34 GT-R is known for its advanced AWD system and RB26 engine, a favorite among enthusiasts.",
+                tags: ["skyline", "gtr", "r34", "r34", "gtr r34", "nissan"]
+            },
+            {
+                name: "Nissan Skyline GT-R R33",
+                year: "1995 - 1998",
+                engine: "2.6L Inline-6 (RB26DETT) Twin Turbo",
+                horsepower: "276 hp (Japan)",
+                topSpeed: "156 mph (251 km/h)",
+                description: "The R33 GT-R improved on the R32’s design with advanced stability and handling.",
+                tags: ["skyline", "gtr", "r33", "nissaan"]
+            },
+            {
+                name: "Nissan Skyline GT-R R32",
+                year: "1989 - 1994",
+                engine: "2.6L Inline-6 (RB26DETT) Twin Turbo",
+                horsepower: "276 hp (Japan)",
+                topSpeed: "156 mph (251 km/h)",
+                description: "The R32 GT-R, nicknamed 'Godzilla,' dominated Japanese motorsports with its AWD and RB26 engine.",
+                tags: ["skyline", "gtr", "r32", "nissan"]
+            },
+            {
+                name: "Mazda RX-7 FD",
+                year: "1992 - 2002",
+                engine: "1.3L Rotary Twin Turbo",
+                horsepower: "252 hp",
+                topSpeed: "155 mph (250 km/h)",
+                description: "The Mazda RX-7 FD is known for its lightweight rotary engine and sleek design, making it a JDM legend.",
+                tags: ["rx7", "mazda", "fd"]
+            },
+            {
+                name: "Honda NSX",
+                year: "1990 - 2005",
+                engine: "3.0L V6 (later 3.2L) Naturally Aspirated",
+                horsepower: "270 hp",
+                topSpeed: "168 mph (270 km/h)",
+                description: "The Honda NSX redefined JDM sports cars with its balance, handling, and F1-inspired design.",
+                tags: ["nsx", "honda"]
+            }
+        ];
+
+        function showSuggestions(value) {
+            const list = document.getElementById('autocompleteList');
+            list.innerHTML = ""; // Clear previous suggestions
+
+            if (value.trim()) {
+                const suggestions = carData.filter(car =>
+                    car.name.toLowerCase().includes(value.toLowerCase()) ||
+                    car.tags.some(tag => tag.includes(value.toLowerCase()))
+                );
+
+                suggestions.forEach(car => {
+                    const item = document.createElement('div');
+                    item.className = 'autocomplete-item';
+                    item.textContent = car.name;
+                    item.onclick = () => {
+                        document.getElementById('searchInput').value = car.name;
+                        list.innerHTML = ""; // Clear suggestions
+                    };
+                    list.appendChild(item);
+                });
+            }
+        }
+
+        function searchCar() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const carInfoDiv = document.getElementById('carInfo');
+            carInfoDiv.innerHTML = ""; // Clear previous info
+
+            const car = carData.find(car =>
+                car.name.toLowerCase().includes(query) ||
+                car.tags.some(tag => tag.includes(query))
+            );
+
+            if (car) {
+                carInfoDiv.innerHTML = `
+                    <h2>${car.name}</h2>
+                    <p><strong>Year:</strong> ${car.year}</p>
+                    <p><strong>Engine:</strong> ${car.engine}</p>
+                    <p><strong>Horsepower:</strong> ${car.horsepower}</p>
+                    <p><strong>Top Speed:</strong> ${car.topSpeed}</p>
+                    <p><strong>Description:</strong> ${car.description}</p>
+                `;
+            } else {
+                carInfoDiv.innerHTML = "<p>No information found.Please try another keyword.</p>";
+            }
+        }
+    </script>
+
+</body>
+</html>
